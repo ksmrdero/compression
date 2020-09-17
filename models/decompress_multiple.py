@@ -1,9 +1,8 @@
-import sys, os
+import sys
+import os
 import time
-path = os.path.dirname(os.path.abspath(__file__))
-
-TEST_DIRECTORY = 'test2/'
-arr = os.listdir(path + '/' + TEST_DIRECTORY)
+import argparse
+import glob
 
 # diable print
 def disablePrint():
@@ -13,17 +12,36 @@ def disablePrint():
 def enablePrint():
     sys.stdout = sys.__stdout__
 
-log = open('log_decompress_{:.0f}'.format(time.time()), 'w')
-start_time = time.time()
-for idx, filename in enumerate(arr):
-    if filename.split('.')[-1] == 'tfci':
-        print('Decompressing {}'.format(idx))
-        lap_time = time.time()
-        disablePrint()
-        os.system('python {}/tfci.py decompress {}'.format(path, TEST_DIRECTORY + filename))
-        enablePrint()
-        log.write('{} File {} Lap Time: {:.2f} Total Time: {:.2f}\n'.format(filename, idx, time.time()-lap_time, time.time()-start_time))
+def process_files(args):
+    log = open('log_decompress_{:.0f}'.format(time.time()), 'w')
+    start_time = time.time()
+    for dirpath, _, filenames in os.walk(args.tfci_dir):
+        for f in filenames:
+            filename = os.path.join(dirpath, f)
+            if filename.split('.')[-1] == 'tfci':
+                lap_time = time.time()
+                disablePrint()
+                os.system('python tfci.py decompress {}'.format(filename))
+                enablePrint()
+            
+                log.write('{} Lap Time: {:.2f} Total Time: {:.2f}\n'.format(filename, time.time()-lap_time, time.time()-start_time))
 
-log.write('Total time compeleted: {:.2f}\n'.format(time.time() - start_time))
+    log.write('Total time compeleted: {:.2f}\n'.format(time.time() - start_time))
+    log.close()
 
-log.close()
+def main(**kwargs):
+    description = "Decompresses all tfci files in a directory"
+    parser = argparse.ArgumentParser(description=description,
+                                     formatter_class= argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-p", "--tfci_dir", type=str, required=True, help="path to directory")
+
+    args = parser.parse_args()
+    input_images = glob.glob(os.path.join(args.tfci_dir, '*.tfci'))
+
+    assert len(
+        input_images) > 0, 'No valid files found in supplied directory!'
+
+    process_files(args)
+
+if __name__ == "__main__":
+    main()
