@@ -4,6 +4,8 @@ import time
 import argparse
 import glob
 
+from tfci import compress
+
 # diable print
 def disablePrint():
     sys.stdout = open(os.devnull, 'w')
@@ -18,9 +20,9 @@ def is_image(filename):
 def start_compress(filename):
     lap_time = time.time()
     disablePrint()
-    os.system(
-        'python tfci.py compress hific-lo {}'.format(filename))
+    compress('hific-lo', filename, None)
     enablePrint()
+
     old_size = os.path.getsize(filename)
     new_size = os.path.getsize(filename + '.tfci')
     ratio = new_size/old_size
@@ -38,6 +40,8 @@ def process_files(args):
                 if not is_image(f):
                     continue
                 filename = os.path.join(dirpath, f)
+                if os.path.isfile(filename + '.tfci'):
+                    continue
                 lap_time, old_size, new_size, ratio = start_compress(filename)
                 log.write('{} Lap Time: {:.2f} Original Size: {} Compressed Size: {} Ratio {:.4f} \n'.format(filename, lap_time, old_size, new_size, ratio))
         else:

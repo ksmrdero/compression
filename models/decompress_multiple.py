@@ -4,6 +4,8 @@ import time
 import argparse
 import glob
 
+from tfci import decompress
+
 # diable print
 def disablePrint():
     sys.stdout = open(os.devnull, 'w')
@@ -21,7 +23,7 @@ def process_files(args):
             if filename.split('.')[-1] == 'tfci':
                 lap_time = time.time()
                 disablePrint()
-                os.system('python tfci.py decompress {}'.format(filename))
+                decompress(filename, None)
                 enablePrint()
             
                 log.write('{} Lap Time: {:.2f} Total Time: {:.2f}\n'.format(filename, time.time()-lap_time, time.time()-start_time))
