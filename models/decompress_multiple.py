@@ -15,12 +15,14 @@ def enablePrint():
     sys.stdout = sys.__stdout__
 
 def process_files(args):
-    log = open('log_decompress_{:.0f}'.format(time.time()), 'w')
+    log = open('logs/log_decompress_{:.0f}'.format(time.time()), 'w')
     start_time = time.time()
     for dirpath, _, filenames in os.walk(args.tfci_dir):
         for f in filenames:
             filename = os.path.join(dirpath, f)
             if filename.split('.')[-1] == 'tfci':
+                if os.path.isfile(filename + '.png'):
+                    continue
                 lap_time = time.time()
                 disablePrint()
                 decompress(filename, None)
