@@ -21,7 +21,7 @@ def process_files(args):
     dir_name = os.path.basename(os.path.normpath(args.image_dir))
     parent_path = os.path.dirname(args.image_dir)
     log = open('logs/log_compress_{}_{}'.format(args.model, dir_name), 'w')
-
+    log.write('name,orig_size,new_size,compress_ratio\n')
     # tfci path
     
     tfci_folder_path = os.path.join(parent_path, '{}_{}_tfci'.format(dir_name, args.model))
